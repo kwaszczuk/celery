@@ -342,6 +342,7 @@ class test_Request(RequestCase):
         req = self.get_request(self.add.s(2, 2))
         req.task.acks_late = True
         req.task.reject_on_worker_lost = True
+        req.task.requeue_on_worker_lost = True
         req.delivery_info['redelivered'] = False
         req.task.backend = Mock()
 
@@ -349,6 +350,26 @@ class test_Request(RequestCase):
 
         req.on_reject.assert_called_with(
             req_logger, req.connection_errors, True)
+        req.task.backend.mark_as_failure.assert_not_called()
+
+
+    def test_on_failure_WorkerLostError_rejects_without_requeue(self):
+        try:
+            raise WorkerLostError()
+        except WorkerLostError:
+            einfo = ExceptionInfo(internal=True)
+
+        req = self.get_request(self.add.s(2, 2))
+        req.task.acks_late = True
+        req.task.reject_on_worker_lost = True
+        req.task.requeue_on_worker_lost = False
+        req.delivery_info['redelivered'] = False
+        req.task.backend = Mock()
+
+        req.on_failure(einfo)
+
+        req.on_reject.assert_called_with(
+            req_logger, req.connection_errors, False)
         req.task.backend.mark_as_failure.assert_not_called()
 
     def test_on_failure_WorkerLostError_redelivered_None(self):

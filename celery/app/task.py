@@ -283,13 +283,22 @@ class Task:
     #: acknowledge tasks when the worker process executing them abruptly
     #: exits or is signaled (e.g., :sig:`KILL`/:sig:`INT`, etc).
     #:
-    #: Setting this to true allows the message to be re-queued instead,
-    #: so that the task will execute again by the same worker, or another
-    #: worker.
+    #: Setting this to true allows the message to be rejected instead.
+    #: If :attr:`requeue_on_worker_lost` is set to True the task will
+    #: execute again by the same worker, or another worker.
     #:
     #: Warning: Enabling this can cause message loops; make sure you know
     #: what you're doing.
     reject_on_worker_lost = None
+
+    #: This option matters only if :attr:`reject_on_worker_lost` is set to
+    #: True.
+    #:
+    #: Setting this to true causes the task from the abrupted worker to be
+    #: re-queued. If it is set to False, the task will be rejected without
+    #: retrying. However, the rejected message will still be placed in the
+    #: broker's dead-letter-exchange if one exists.
+    requeue_on_worker_lost = None
 
     #: Tuple of expected exceptions.
     #:
@@ -330,6 +339,7 @@ class Task:
         ('acks_late', 'task_acks_late'),
         ('acks_on_failure_or_timeout', 'task_acks_on_failure_or_timeout'),
         ('reject_on_worker_lost', 'task_reject_on_worker_lost'),
+        ('requeue_on_worker_lost', 'task_requeue_on_worker_lost'),
         ('ignore_result', 'task_ignore_result'),
         ('store_eager_result', 'task_store_eager_result'),
         ('store_errors_even_if_ignored', 'task_store_errors_even_if_ignored'),

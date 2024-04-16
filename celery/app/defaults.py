@@ -285,6 +285,7 @@ NAMESPACES = Namespace(
         queues=Option(type='dict'),
         queue_max_priority=Option(None, type='int'),
         reject_on_worker_lost=Option(type='bool'),
+        requeue_on_worker_lost=Option(True, type='bool'),
         remote_tracebacks=Option(False, type='bool'),
         routes=Option(type='any'),
         send_sent_event=Option(

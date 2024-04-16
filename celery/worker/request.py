@@ -607,7 +607,7 @@ class Request:
             )
             ack = self.task.acks_on_failure_or_timeout
             if reject:
-                requeue = True
+                requeue = self.task.requeue_on_worker_lost
                 self.reject(requeue=requeue)
                 send_failed_event = False
             elif ack:
